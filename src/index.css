@@ -1,10 +1,28 @@
+/* stylelint-disable at-rule-no-unknown, at-rule-unknown */
+/* eslint-disable */
+/* CSS Reset and Tailwind CSS imports */
+/* These @tailwind directives are processed by PostCSS and Tailwind CSS */
+/* All Tailwind CSS at-rules (@tailwind, @apply, @layer) are valid and processed by PostCSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* stylelint-enable at-rule-no-unknown */
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Custom animations for auth pages */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
 
 @layer base {
   :root {
@@ -59,19 +77,12 @@ All colors MUST be HSL.
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -116,15 +127,131 @@ All colors MUST be HSL.
 
 @layer base {
   * {
+    /* Tailwind CSS utility for consistent borders */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
+    /* Tailwind CSS utilities for background and text colors */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-background text-foreground;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  .font-brand {
+    font-family: 'Fredoka One', cursive;
+  }
+  
+  .material-symbols-outlined {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24;
   }
 }
 
 @layer utilities {
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fade-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(var(--accent) / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 40px hsl(var(--accent) / 0.4);
+    }
+  }
+
+  @keyframes grow {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  .scroll-animate {
+    animation: fade-in-up 0.8s ease-out forwards;
+  }
+
+  .scroll-animate-left {
+    animation: fade-in-left 0.8s ease-out forwards;
+  }
+
+  .scroll-animate-right {
+    animation: fade-in-right 0.8s ease-out forwards;
+  }
+
+  .scroll-animate-scale {
+    animation: scale-in 0.8s ease-out forwards;
+  }
+
+  /* Smooth scrolling for all elements */
+  * {
+    scroll-behavior: smooth;
+  }
+
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
   /* Nature-themed utility classes */
   .bg-gradient-nature {
     background: var(--gradient-nature);
@@ -152,11 +279,15 @@ All colors MUST be HSL.
   
   /* Gamification elements */
   .achievement-glow {
+    /* Tailwind CSS utilities for glow effect and border */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply shadow-glow border border-accent/20;
     animation: pulse-glow 2s ease-in-out infinite;
   }
   
   .progress-bar {
+    /* Tailwind CSS utilities for gradient background and rounded corners */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-gradient-primary rounded-full;
     animation: grow 1s ease-out forwards;
   }
@@ -165,16 +296,26 @@ All colors MUST be HSL.
 @layer components {
   /* Interactive hover effects */
   .card-hover {
+    /* Tailwind CSS utilities for smooth transitions and hover effects */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply transition-organic hover:shadow-nature hover:-translate-y-1 hover:scale-[1.02];
   }
   
   .btn-nature {
+    /* Tailwind CSS utilities for button styling */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-gradient-primary text-primary-foreground rounded-xl px-6 py-3 font-medium;
+    /* Tailwind CSS utilities for button hover effects */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply transition-organic hover:shadow-glow hover:scale-105;
   }
   
   .topic-card {
+    /* Tailwind CSS utilities for card styling */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl p-6;
+    /* Tailwind CSS utilities for card hover effects */
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply card-hover shadow-nature;
   }
 }
