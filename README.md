@@ -1,73 +1,99 @@
-# Welcome to your Lovable project
+# EcoLearn - Environmental Education Platform
 
-## Project info
+A gamified environmental education platform that makes learning about sustainability interactive and engaging.
 
-**URL**: https://lovable.dev/projects/64507fcf-b93b-44b6-898d-59728809b8e4
+## 🌱 Features
 
-## How can I edit this code?
+- **Interactive Learning**: Engaging lessons on ecosystems, climate change, and sustainability
+- **Gamification**: Points, badges, streaks, and achievements to motivate learners
+- **Progress Tracking**: Monitor your learning journey with detailed progress stats
+- **Leaderboards**: Compete with other learners globally
+- **Beautiful UI**: Nature-themed design with smooth animations
 
-There are several ways of editing your application.
+## 🚀 Quick Start
 
-**Use Lovable**
+### Prerequisites
+- Node.js 18+ and npm
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/64507fcf-b93b-44b6-898d-59728809b8e4) and start prompting.
+### Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+Copy `.env.example` to `.env.local` (or `.env`) and add your Supabase credentials:
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+cp .env.example .env.local
 ```
 
-**Edit a file directly in GitHub**
+```
+VITE_SUPABASE_URL=<your-supabase-project-url>
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+These environment files are ignored by Git. Do not commit real credentials.
 
-**Use GitHub Codespaces**
+```bash
+# Install dependencies
+npm install
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+# Start development server
+npm run dev
 
-## What technologies are used for this project?
+# Build for production
+npm run build
 
-This project is built with:
+# Preview production build
+npm run preview
+```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🛠️ Tech Stack
 
-## How can I deploy this project?
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Routing**: React Router DOM
+- **State Management**: TanStack Query
+- **Icons**: Lucide React
+- **Forms**: React Hook Form + Zod
 
-Simply open [Lovable](https://lovable.dev/projects/64507fcf-b93b-44b6-898d-59728809b8e4) and click on Share -> Publish.
+## 📁 Project Structure
 
-## Can I connect a custom domain to my Lovable project?
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui component library
+│   ├── Hero.tsx        # Landing page hero
+│   ├── Navigation.tsx  # Site navigation
+│   └── ...
+├── pages/              # Route components
+│   ├── Index.tsx       # Home page
+│   ├── Learn.tsx       # Learning interface
+│   └── Leaderboard.tsx # Competition rankings
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+└── assets/             # Static assets
+```
 
-Yes, you can!
+## 🎨 Design System
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The project uses a nature-inspired design system with:
+- Forest green and earth tone color palette
+- Organic animations (floating, leaf-fall effects)
+- Custom gradients and shadows
+- Responsive design patterns
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📱 Pages
+
+- **Home**: Welcome page with progress overview and topic previews
+- **Learn**: Interactive lessons with progress tracking
+- **Leaderboard**: Global rankings and achievements
+
+## 🌟 Development
+
+The project is structured for easy development with:
+- Hot module replacement via Vite
+- TypeScript for type safety
+- ESLint for code quality
+- Tailwind CSS for rapid styling
+
+## 📄 License
+
+MIT License - feel free to use this project as a foundation for your own environmental education initiatives!
