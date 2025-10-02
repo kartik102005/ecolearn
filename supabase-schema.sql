@@ -95,6 +95,8 @@ create table if not exists courses (
   topics text[] default '{}',
   icon text,
   color text,
+  intro_video_storage_path text,
+  intro_video_thumbnail_path text,
   created_at timestamp with time zone default now(),
   updated_at timestamp with time zone default now()
 );
@@ -114,6 +116,41 @@ drop trigger if exists courses_updated_at on courses;
 create trigger courses_updated_at
   before update on courses
   for each row execute procedure public.handle_updated_at();
+
+-- Course lessons table with per-lesson media metadata
+create table if not exists course_lessons (
+  id uuid primary key default gen_random_uuid(),
+  course_id text references courses(id) on delete cascade,
+  slug text not null,
+  title text not null,
+  description text,
+  order_index integer not null default 0,
+  duration text,
+  video_storage_path text,
+  video_thumbnail_path text,
+  transcript text,
+  created_at timestamp with time zone default now(),
+  updated_at timestamp with time zone default now(),
+  unique(course_id, slug)
+);
+
+alter table course_lessons enable row level security;
+
+drop policy if exists "Everyone can view course lessons" on course_lessons;
+create policy "Everyone can view course lessons" on course_lessons
+  for select using (true);
+
+drop policy if exists "Only service role can modify course lessons" on course_lessons;
+create policy "Only service role can modify course lessons" on course_lessons
+  for all using (auth.role() = 'service_role')
+  with check (auth.role() = 'service_role');
+
+drop trigger if exists course_lessons_updated_at on course_lessons;
+create trigger course_lessons_updated_at
+  before update on course_lessons
+  for each row execute procedure public.handle_updated_at();
+
+create index if not exists idx_course_lessons_course on course_lessons(course_id, order_index);
 
 -- Create course progress table (per-user progress records)
 create table if not exists course_progress (

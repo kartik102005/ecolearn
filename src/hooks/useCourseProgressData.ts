@@ -23,8 +23,8 @@ interface UseCourseProgressDataResult {
 
 export const useCourseProgressData = (): UseCourseProgressDataResult => {
   const { user } = useAuth()
-  const userId = user?.email || 'demo-user'
-  const hasAuthenticatedUser = Boolean(user?.email)
+  const userId = user?.id ?? ''
+  const hasAuthenticatedUser = Boolean(userId)
   const queryClient = useQueryClient()
 
   const coursesQuery = useQuery<Course[], Error>({
@@ -37,6 +37,7 @@ export const useCourseProgressData = (): UseCourseProgressDataResult => {
   const progressQuery = useQuery<CourseProgressEntry[], Error>({
     queryKey: courseProgressKey(userId),
     queryFn: () => courseService.getUserCourseProgress(userId),
+    enabled: hasAuthenticatedUser,
     staleTime: 60 * 1000,
     gcTime: 10 * 60 * 1000,
   })

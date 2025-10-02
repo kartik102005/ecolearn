@@ -34,13 +34,13 @@ const AchievementsList: React.FC = () => {
   // Fetch user progress data
   useEffect(() => {
     const fetchUserProgress = async () => {
-      if (!user?.email) {
+      if (!user?.id) {
         setLoading(false);
         return;
       }
       
       try {
-        const progressData = await courseService.getUserCourseProgress(user.email);
+        const progressData = await courseService.getUserCourseProgress(user.id);
         setUserProgress(progressData);
       } catch (error) {
         console.error('Failed to fetch user progress:', error);
@@ -50,7 +50,7 @@ const AchievementsList: React.FC = () => {
     };
     
     fetchUserProgress();
-  }, [user?.email]);
+  }, [user?.id]);
   
   // Calculate user statistics
   const calculateUserStats = () => {

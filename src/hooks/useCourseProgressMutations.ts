@@ -17,70 +17,34 @@ interface UseCourseProgressMutationsResult {
   error: Error | null
 }
 
-const computeNextProgress = (currentProgress: number) => {
-  if (currentProgress <= 0) {
-    return 15
-  }
-  return Math.min(currentProgress + 25, 100)
-}
-
 export const useCourseProgressMutations = (): UseCourseProgressMutationsResult => {
   const { user } = useAuth()
-  const userId = user?.email || 'demo-user'
+  const userId = user?.id ?? ''
   const queryClient = useQueryClient()
   const [pendingCourseId, setPendingCourseId] = useState<string | null>(null)
 
   const mutation = useMutation({
     mutationFn: async ({ courseId, currentProgress }: CourseProgressMutationVariables) => {
-      const nextProgress = computeNextProgress(currentProgress)
+      if (!userId) {
+        throw new Error('Must be signed in to track course progress')
+      }
 
       if (currentProgress <= 0) {
         await courseService.startCourse(userId, courseId)
       }
 
-      await courseService.updateCourseProgress(userId, courseId, nextProgress)
-
-      return { courseId, nextProgress }
+      return { courseId, nextProgress: currentProgress }
     },
     onMutate: async (variables) => {
+      if (!userId) {
+        throw new Error('Must be signed in to track course progress')
+      }
+
       setPendingCourseId(variables.courseId)
       const queryKey = courseProgressKey(userId)
 
       await queryClient.cancelQueries({ queryKey })
       const previousData = queryClient.getQueryData<CourseProgressEntry[]>(queryKey) || []
-
-      const nextProgress = computeNextProgress(variables.currentProgress)
-      const now = new Date().toISOString()
-
-      const optimisticData = (() => {
-        const existingIndex = previousData.findIndex(entry => entry.id === variables.courseId)
-        if (existingIndex === -1) {
-          const newEntry: CourseProgressEntry = {
-            id: variables.courseId,
-            user_id: userId,
-            progress: nextProgress,
-            completed: nextProgress >= 100,
-            started_at: now,
-            completed_at: nextProgress >= 100 ? now : undefined,
-            course: null,
-          }
-          return [...previousData, newEntry]
-        }
-
-        const existing = previousData[existingIndex]
-        const updated: CourseProgressEntry = {
-          ...existing,
-          progress: nextProgress,
-          completed: nextProgress >= 100,
-          completed_at: nextProgress >= 100 ? now : existing.completed_at,
-        }
-
-        const clone = [...previousData]
-        clone.splice(existingIndex, 1, updated)
-        return clone
-      })()
-
-      queryClient.setQueryData<CourseProgressEntry[]>(queryKey, optimisticData)
 
       return { previousData }
     },

@@ -14,6 +14,23 @@ export interface Profile {
   updated_at: string
 }
 
+export interface CourseLesson {
+  id: string
+  courseId: string
+  slug: string
+  title: string
+  description?: string
+  orderIndex: number
+  duration?: string
+  videoStoragePath?: string | null
+  videoThumbnailPath?: string | null
+  videoSignedUrl?: string | null
+  videoThumbnailUrl?: string | null
+  transcript?: string
+  created_at?: string
+  updated_at?: string
+}
+
 export interface Course {
   id: string
   title: string
@@ -24,8 +41,85 @@ export interface Course {
   topics: string[]
   icon: string
   color: string
+  introVideoStoragePath?: string | null
+  introVideoThumbnailPath?: string | null
+  introVideoSignedUrl?: string | null
+  introVideoThumbnailUrl?: string | null
+  lessonModules?: CourseLesson[]
   created_at: string
 }
+
+const DEFAULT_VIDEO_ID = '5eTCZ9L834s'
+const DEFAULT_INTRO_VIDEO_URL = `https://www.youtube.com/embed/${DEFAULT_VIDEO_ID}`
+const DEFAULT_THUMBNAIL_URL = `https://img.youtube.com/vi/${DEFAULT_VIDEO_ID}/hqdefault.jpg`
+
+const createLessonModules = (courseId: string, topics: string[]): CourseLesson[] =>
+  topics.map((topic, index) => ({
+    id: `${courseId}-lesson-${index + 1}`,
+    courseId,
+    slug: `lesson-${index + 1}`,
+    title: topic,
+    description: `Learn about ${topic}`,
+    orderIndex: index,
+    videoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    videoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+  }))
+
+const course1Topics = [
+  'Components of Environment (Air, Water, Soil, Living Organisms)',
+  'Natural vs. Man-Made Environment',
+  'Importance of Environmental Awareness'
+]
+const course2Topics = [
+  'Types of Ecosystems (Forest, Desert, Aquatic)',
+  'Food Chains and Food Webs',
+  'Importance of Biodiversity'
+]
+const course3Topics = [
+  'Renewable and Non-renewable Resources',
+  'Water and Soil Conservation',
+  'Sustainable Use of Resources'
+]
+const course4Topics = [
+  'Air, Water, and Soil Pollution',
+  'Noise and Plastic Pollution',
+  'Health and Environmental Impact'
+]
+const course5Topics = [
+  'Causes (Greenhouse Gases, Deforestation, Industrialization)',
+  'Effects on Weather Patterns, Agriculture, and Health',
+  'International Efforts (Kyoto Protocol, Paris Agreement)'
+]
+const course6Topics = [
+  'Environmental Protection Act',
+  'Forest and Wildlife Protection Laws',
+  'Role of NGOs and Citizens'
+]
+const course7Topics = [
+  'Principles of Sustainability',
+  'Green Energy (Solar, Wind, Hydropower)',
+  'Sustainable Agriculture and Urban Planning'
+]
+const course8Topics = [
+  'Waste-to-Energy Technologies',
+  'Electric Vehicles and Clean Transport',
+  'Smart Cities and Green Architecture'
+]
+const course9Topics = [
+  'Deforestation and Desertification',
+  'Loss of Biodiversity and Species Extinction',
+  'International Cooperation and Future Challenges'
+]
+
+const course1Lessons = createLessonModules('course-1', course1Topics)
+const course2Lessons = createLessonModules('course-2', course2Topics)
+const course3Lessons = createLessonModules('course-3', course3Topics)
+const course4Lessons = createLessonModules('course-4', course4Topics)
+const course5Lessons = createLessonModules('course-5', course5Topics)
+const course6Lessons = createLessonModules('course-6', course6Topics)
+const course7Lessons = createLessonModules('course-7', course7Topics)
+const course8Lessons = createLessonModules('course-8', course8Topics)
+const course9Lessons = createLessonModules('course-9', course9Topics)
 
 export interface Game {
   id: string
@@ -86,15 +180,14 @@ export const mockCourses: Course[] = [
     title: 'Introduction to Environment',
     description: 'Learn the fundamentals of environmental science including air, water, soil, and living organisms.',
     difficulty: 'beginner',
-    lessons: 8,
+    lessons: course1Lessons.length,
     duration: '3 weeks',
-    topics: [
-      'Components of Environment (Air, Water, Soil, Living Organisms)',
-      'Natural vs. Man-Made Environment',
-      'Importance of Environmental Awareness'
-    ],
+    topics: course1Topics,
     icon: '🌱',
     color: 'from-green-500 to-emerald-600',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course1Lessons,
     created_at: '2024-01-01T00:00:00Z'
   },
   {
@@ -102,15 +195,14 @@ export const mockCourses: Course[] = [
     title: 'Ecosystems and Biodiversity',
     description: 'Explore different ecosystems and understand the importance of biodiversity in nature.',
     difficulty: 'beginner',
-    lessons: 12,
+    lessons: course2Lessons.length,
     duration: '4 weeks',
-    topics: [
-      'Types of Ecosystems (Forest, Desert, Aquatic)',
-      'Food Chains and Food Webs',
-      'Importance of Biodiversity'
-    ],
+    topics: course2Topics,
     icon: '🦋',
     color: 'from-blue-500 to-cyan-600',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course2Lessons,
     created_at: '2024-01-02T00:00:00Z'
   },
   {
@@ -118,15 +210,14 @@ export const mockCourses: Course[] = [
     title: 'Natural Resources',
     description: 'Understanding and conserving our planet\'s valuable natural resources for future generations.',
     difficulty: 'beginner',
-    lessons: 10,
+    lessons: course3Lessons.length,
     duration: '3 weeks',
-    topics: [
-      'Renewable and Non-renewable Resources',
-      'Water and Soil Conservation',
-      'Sustainable Use of Resources'
-    ],
+    topics: course3Topics,
     icon: '💧',
     color: 'from-purple-500 to-indigo-600',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course3Lessons,
     created_at: '2024-01-03T00:00:00Z'
   },
   // Intermediate Courses
@@ -135,15 +226,14 @@ export const mockCourses: Course[] = [
     title: 'Pollution and Its Effects',
     description: 'Comprehensive study of pollution types and their devastating impacts on environment and health.',
     difficulty: 'intermediate',
-    lessons: 14,
+    lessons: course4Lessons.length,
     duration: '4 weeks',
-    topics: [
-      'Air, Water, and Soil Pollution',
-      'Noise and Plastic Pollution',
-      'Health and Environmental Impact'
-    ],
+    topics: course4Topics,
     icon: '🏭',
     color: 'from-orange-500 to-red-600',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course4Lessons,
     created_at: '2024-01-04T00:00:00Z'
   },
   {
@@ -151,15 +241,14 @@ export const mockCourses: Course[] = [
     title: 'Climate Change and Global Warming',
     description: 'Understanding causes, effects, and global efforts to combat climate change and global warming.',
     difficulty: 'intermediate',
-    lessons: 16,
+    lessons: course5Lessons.length,
     duration: '5 weeks',
-    topics: [
-      'Causes (Greenhouse Gases, Deforestation, Industrialization)',
-      'Effects on Weather Patterns, Agriculture, and Health',
-      'International Efforts (Kyoto Protocol, Paris Agreement)'
-    ],
+    topics: course5Topics,
     icon: '🌡️',
     color: 'from-red-500 to-pink-600',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course5Lessons,
     created_at: '2024-01-05T00:00:00Z'
   },
   {
@@ -167,15 +256,14 @@ export const mockCourses: Course[] = [
     title: 'Environmental Laws and Policies',
     description: 'Study of environmental legislation and policy frameworks for environmental protection.',
     difficulty: 'intermediate',
-    lessons: 12,
+    lessons: course6Lessons.length,
     duration: '4 weeks',
-    topics: [
-      'Environmental Protection Act',
-      'Forest and Wildlife Protection Laws',
-      'Role of NGOs and Citizens'
-    ],
+    topics: course6Topics,
     icon: '⚖️',
     color: 'from-indigo-500 to-purple-600',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course6Lessons,
     created_at: '2024-01-06T00:00:00Z'
   },
   // Advanced Courses
@@ -184,15 +272,14 @@ export const mockCourses: Course[] = [
     title: 'Sustainable Development',
     description: 'Master the principles of sustainability and explore green technologies for a better future.',
     difficulty: 'advanced',
-    lessons: 18,
+    lessons: course7Lessons.length,
     duration: '6 weeks',
-    topics: [
-      'Principles of Sustainability',
-      'Green Energy (Solar, Wind, Hydropower)',
-      'Sustainable Agriculture and Urban Planning'
-    ],
+    topics: course7Topics,
     icon: '♻️',
     color: 'from-teal-600 to-green-700',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course7Lessons,
     created_at: '2024-01-07T00:00:00Z'
   },
   {
@@ -200,15 +287,14 @@ export const mockCourses: Course[] = [
     title: 'Emerging Environmental Technologies',
     description: 'Advanced technologies and innovations for solving environmental challenges.',
     difficulty: 'advanced',
-    lessons: 20,
+    lessons: course8Lessons.length,
     duration: '5 weeks',
-    topics: [
-      'Waste-to-Energy Technologies',
-      'Electric Vehicles and Clean Transport',
-      'Smart Cities and Green Architecture'
-    ],
+    topics: course8Topics,
     icon: '🔬',
     color: 'from-cyan-600 to-blue-700',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course8Lessons,
     created_at: '2024-01-08T00:00:00Z'
   },
   {
@@ -216,15 +302,14 @@ export const mockCourses: Course[] = [
     title: 'Global Environmental Issues',
     description: 'Critical analysis of worldwide environmental challenges and international cooperation.',
     difficulty: 'advanced',
-    lessons: 22,
+    lessons: course9Lessons.length,
     duration: '6 weeks',
-    topics: [
-      'Deforestation and Desertification',
-      'Loss of Biodiversity and Species Extinction',
-      'International Cooperation and Future Challenges'
-    ],
+    topics: course9Topics,
     icon: '🌍',
     color: 'from-slate-600 to-gray-800',
+    introVideoSignedUrl: DEFAULT_INTRO_VIDEO_URL,
+    introVideoThumbnailUrl: DEFAULT_THUMBNAIL_URL,
+    lessonModules: course9Lessons,
     created_at: '2024-01-09T00:00:00Z'
   }
 ]

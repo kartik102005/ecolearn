@@ -317,7 +317,9 @@ const Settings: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Get user progress data
-      const progressData = await courseService.getUserCourseProgress(user.email || 'demo-user');
+      const progressData = user.id
+        ? await courseService.getUserCourseProgress(user.id)
+        : [];
       
       // Create export data object
       const exportData = {

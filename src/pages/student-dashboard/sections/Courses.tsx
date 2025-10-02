@@ -1,11 +1,14 @@
 import React, { useState, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCourseProgressData } from '@/hooks/useCourseProgressData';
 import { useCourseProgressMutations } from '@/hooks/useCourseProgressMutations';
 import type { Course } from '@/lib/mockData';
 import { getAccessibleGradient, focusRingClasses } from '@/utils/colorAccessibility';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CourseWithProgress extends Course {
   progress?: number;
+  hasProgressEntry?: boolean;
 }
 
 const Courses: React.FC = () => {
@@ -20,11 +23,15 @@ const Courses: React.FC = () => {
     refetchAll,
   } = useCourseProgressData();
   const {
-    startOrAdvanceCourse,
+    startOrAdvanceCourseAsync,
     isPending,
     pendingCourseId,
     error: mutationError,
   } = useCourseProgressMutations();
+
+  const [previewCourseId, setPreviewCourseId] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const coursesWithProgress = useMemo<CourseWithProgress[]>(() => {
     return courses.map(course => {
@@ -32,20 +39,37 @@ const Courses: React.FC = () => {
       return {
         ...course,
         progress: progressEntry?.progress ?? 0,
+        hasProgressEntry: Boolean(progressEntry),
       };
     });
   }, [courses, courseProgress]);
 
-  const handleCourseAction = useCallback(
-    (courseId: string, currentProgress: number) => {
-      startOrAdvanceCourse({ courseId, currentProgress });
+  const handleCourseEnrollment = useCallback(
+    async (course: CourseWithProgress) => {
+      const currentProgress = typeof course.progress === 'number' ? course.progress : 0;
+
+      if (course.hasProgressEntry || currentProgress > 0) {
+        return false;
+      }
+
+      await startOrAdvanceCourseAsync({ courseId: course.id, currentProgress });
+
+      toast({
+        title: '🎉 Enrollment Successful!',
+        description: `You're all set to begin "${course.title}". Dive in and start learning!`,
+        duration: 4000,
+        className:
+          'border border-emerald-400 bg-emerald-50 text-emerald-900 shadow-lg shadow-emerald-200 animate-in slide-in-from-top-2 fade-in duration-300',
+      });
+
+      return true;
     },
-    [startOrAdvanceCourse]
+    [startOrAdvanceCourseAsync, toast]
   );
 
   // Filter courses based on active filter
   const filteredCourses = useMemo(() => {
-    return coursesWithProgress.filter(course => 
+    return coursesWithProgress.filter(course =>
       activeFilter === 'all' || course.difficulty === activeFilter
     );
   }, [activeFilter, coursesWithProgress]);
@@ -183,22 +207,33 @@ const Courses: React.FC = () => {
         {filteredCourses.map((course) => {
           const courseProgressValue = typeof course.progress === 'number' ? course.progress : 0;
           const isCompleted = courseProgressValue >= 100;
-          const isStarted = courseProgressValue > 0;
+          const isStarted = course.hasProgressEntry ?? courseProgressValue > 0;
           const difficultyColor = course.difficulty === 'beginner' ? 'text-green-600' : 
                                  course.difficulty === 'intermediate' ? 'text-yellow-600' : 'text-red-600';
           
           const headerGradient = getAccessibleGradient(course.color);
 
           const actionGradient = isCompleted
-            ? getAccessibleGradient('from-green-600 to-green-700')
+            ? getAccessibleGradient('from-emerald-500 to-teal-500')
             : isStarted
-              ? getAccessibleGradient('from-orange-500 to-red-500')
-              : getAccessibleGradient('from-blue-600 to-indigo-600');
+              ? getAccessibleGradient('from-sky-500 to-indigo-500')
+              : getAccessibleGradient('from-rose-500 to-orange-500');
+
+          const lessonModules = course.lessonModules ?? [];
+          const topicsPreview = (course.topics ?? []).slice(0, 2);
+          const isPreviewing = previewCourseId === course.id;
 
           return (
             <div
               key={course.id}
-              className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col h-full"
+              className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 flex flex-col h-full ${
+                !isStarted ? 'hover:shadow-xl hover:-translate-y-1 cursor-pointer' : 'hover:shadow-xl hover:scale-105'
+              }`}
+              onClick={() => {
+                if (!isStarted) {
+                  setPreviewCourseId(course.id);
+                }
+              }}
             >
               {/* Course Header */}
               <div className={`bg-gradient-to-r ${headerGradient} p-6 text-white`}>
@@ -259,8 +294,8 @@ const Courses: React.FC = () => {
                 <div className="mb-4 flex-1">
                   <span className="text-sm text-gray-600 dark:text-gray-400">Topics:</span>
                   <p className="text-sm text-gray-800 dark:text-gray-200 mt-1">
-                    {course.topics.slice(0, 2).join(' • ')}
-                    {course.topics.length > 2 && ` • +${course.topics.length - 2} more`}
+                    {topicsPreview.join(' • ')}
+                    {(course.topics?.length ?? 0) > 2 && ` • +${(course.topics?.length ?? 0) - 2} more`}
                   </p>
                 </div>
 
@@ -280,17 +315,35 @@ const Courses: React.FC = () => {
 
                 {/* Action Button */}
                 <button 
-                  onClick={() => handleCourseAction(course.id, courseProgressValue)}
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (!isStarted) {
+                      handleCourseEnrollment(course)
+                        .then(success => {
+                          if (!success) return;
+                          setPreviewCourseId(null);
+                          navigate(`/courses/${course.id}`);
+                        })
+                        .catch(() => {
+                          toast({
+                            title: 'Enrollment failed',
+                            description: 'Something went wrong while enrolling. Please try again.',
+                            variant: 'destructive',
+                          });
+                        });
+                    } else {
+                      navigate(`/courses/${course.id}`);
+                    }
+                  }}
                   disabled={pendingCourseId === course.id || isPending}
                   className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:brightness-110 shadow-lg bg-gradient-to-r ${actionGradient} text-white disabled:opacity-70 disabled:cursor-not-allowed ${focusRingClasses}`}
                 >
                   {pendingCourseId === course.id
                     ? '⏳ Updating...'
-                    : isCompleted 
-                      ? '📖 Review Course' 
-                      : isStarted
-                        ? '▶️ Continue Learning'
-                        : '🚀 Start Course'
+                    : !isStarted
+                      ? '🎓 Enroll Course'
+                      : '▶️ Start Learning'
                   }
                 </button>
               </div>
@@ -298,6 +351,52 @@ const Courses: React.FC = () => {
           );
         })}
       </div>
+
+      {previewCourseId && (() => {
+        const course = filteredCourses.find(c => c.id === previewCourseId);
+        if (!course) return null;
+        const lessonModules = course.lessonModules ?? [];
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/85 backdrop-blur">
+            <div className="max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-[32px] border border-emerald-500/30 bg-white shadow-emerald-500/30 shadow-2xl">
+              <div className="flex items-center justify-between border-b border-emerald-100 bg-emerald-50 px-6 py-5">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-500">Full Syllabus</p>
+                  <h3 className="text-2xl font-bold text-emerald-700">{course.title}</h3>
+                  <p className="text-sm text-emerald-600/90">What you will learn throughout this course</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewCourseId(null)}
+                  className="rounded-full border border-emerald-200 px-4 py-1.5 text-sm font-semibold text-emerald-600 hover:bg-emerald-100"
+                >
+                  Close
+                </button>
+              </div>
+              <div className="max-h-[70vh] overflow-y-auto px-6 py-6 space-y-4">
+                {lessonModules.length === 0 ? (
+                  <p className="text-sm text-emerald-600/80">Syllabus details coming soon.</p>
+                ) : (
+                  lessonModules.map((lesson, index) => (
+                    <div key={lesson.id} className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+                      <div className="flex items-center justify-between text-emerald-500">
+                        <span className="text-sm font-semibold uppercase tracking-wide">Lesson {index + 1}</span>
+                        {lesson.duration && (
+                          <span className="text-xs text-emerald-500">{lesson.duration}</span>
+                        )}
+                      </div>
+                      <h4 className="mt-2 text-lg font-semibold text-emerald-800">{lesson.title}</h4>
+                      {lesson.description && (
+                        <p className="mt-1 text-sm text-emerald-600/80">{lesson.description}</p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Empty State */}
       {filteredCourses.length === 0 && (

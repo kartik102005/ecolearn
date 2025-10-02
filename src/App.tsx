@@ -15,6 +15,7 @@ const Index = lazy(() => import("./pages/Index"));
 const Learn = lazy(() => import("./pages/Learn"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Courses = lazy(() => import("./pages/Courses"));
+const CoursePlayer = lazy(() => import("./pages/CoursePlayer"));
 const About = lazy(() => import("./pages/About"));
 const Community = lazy(() => import("./pages/Community"));
 const SignIn = lazy(() => import("./pages/SignIn"));
@@ -48,6 +49,14 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/learn" element={<Learn />} />
                 <Route path="/courses" element={<Courses />} />
+                <Route
+                  path="/courses/:courseId"
+                  element={
+                    <ProtectedRoute>
+                      <CoursePlayer />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/about" element={<About />} />
                 <Route path="/community" element={<Community />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />

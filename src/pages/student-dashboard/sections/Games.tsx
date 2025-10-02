@@ -1,258 +1,183 @@
 import React, { useState } from 'react';
-import { getAccessibleGradient, focusRingClasses } from '@/utils/colorAccessibility';
 
-interface Game {
-  id: number;
-  title: string;
-  description: string;
-  category: 'quiz' | 'puzzle' | 'simulation' | 'adventure' | 'memory';
-  difficulty: 'easy' | 'medium' | 'hard';
-  duration: string;
-  players: 'single' | 'multiplayer';
-  points: number;
-  icon: string;
-  color: string;
-  status: 'available' | 'playing' | 'completed' | 'locked';
-  progress?: number;
-  highScore?: number;
-}
+const ecoGames = [
+  {
+    title: 'Guardians of the Planet',
+    image: 'https://ecokids.net/wp-content/uploads/pic-guardianes.webp',
+    description: 'Team up with friends to defend the planet and restore balance.',
+    link: 'https://ecokids.net/guardians-of-the-planet/'
+  },
+  {
+    title: 'Recycle and Learn',
+    image: 'https://ecokids.net/wp-content/uploads/2023/08/reciclaje-2.jpg',
+    description: 'Sort recyclable materials correctly to keep the city spotless.',
+    link: 'https://ecokids.net/recycle-and-learn/'
+  },
+  {
+    title: "Run, it's Dripping!",
+    image: 'https://ecokids.net/wp-content/uploads/2023/08/caminito-1.jpg',
+    description: 'Race through the maze to close leaky taps before water is wasted.',
+    link: 'https://ecokids.net/run-its-dripping/'
+  },
+  {
+    title: "Let's Recover the Forest",
+    image: 'https://ecokids.net/wp-content/uploads/2023/08/deforestacion-1.jpg',
+    description: 'Replant trees and bring wildlife back to their natural homes.',
+    link: 'https://ecokids.net/lets-recover-the-forest/'
+  }
+];
 
-type GameFilter = 'all' | Game['category'];
+const ecoArticles = [
+  {
+    title: 'Discover How to Prevent Pollution of the Planet',
+    image: 'https://ecokids.net/wp-content/uploads/contaminacion-1.webp',
+    link: 'https://ecokids.net/discover-how-to-prevent-pollution-of-the-planet/'
+  },
+  {
+    title: 'Energy Journey to the Future: Discovering Renewable Energy',
+    image: 'https://ecokids.net/wp-content/uploads/energias-renovables.webp',
+    link: 'https://ecokids.net/energy-journey-to-the-future-discovering-renewable-energy/'
+  },
+  {
+    title: "Goodbye Plastic: Let's Learn to Reduce Its Use",
+    image: 'https://ecokids.net/wp-content/uploads/plasticos.webp',
+    link: 'https://ecokids.net/goodbye-plastic-lets-learn-to-reduce-its-use-and-take-care-of-the-planet/'
+  },
+  {
+    title: 'The Importance of Taking Care of Our Forests',
+    image: 'https://ecokids.net/wp-content/uploads/deforestacion.webp',
+    link: 'https://ecokids.net/the-importance-of-taking-care-of-our-forests/'
+  }
+];
 
 const Games: React.FC = () => {
-  const [activeFilter, setActiveFilter] = useState<GameFilter>('all');
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  const games: Game[] = [];
-
-  const filteredGames = activeFilter === 'all' 
-    ? games 
-    : games.filter(game => game.category === activeFilter);
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'available':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'playing':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'locked':
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
+  const handleGoBack = () => {
+    window.history.back();
   };
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'easy':
-        return 'text-green-600';
-      case 'medium':
-        return 'text-yellow-600';
-      case 'hard':
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
-    }
+  const handleStartGame = () => {
+    setIsPlaying(true);
+  };
+
+  const handleStopGame = () => {
+    setIsPlaying(false);
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex items-center gap-4 mb-8">
-        <span className="material-symbols-outlined text-4xl text-green-600">sports_esports</span>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Environmental Games</h1>
-          <p className="text-gray-600 dark:text-gray-400">Learn about the environment through fun and interactive games</p>
-        </div>
-      </div>
-
-      {/* Game Category Tabs */}
-      <div className="flex gap-4 mb-8 flex-wrap">
-        {([
-          { id: 'all', label: 'All Games', count: games.length },
-          { id: 'quiz', label: 'Quiz', count: games.filter(g => g.category === 'quiz').length },
-          { id: 'puzzle', label: 'Puzzle', count: games.filter(g => g.category === 'puzzle').length },
-          { id: 'simulation', label: 'Simulation', count: games.filter(g => g.category === 'simulation').length },
-          { id: 'adventure', label: 'Adventure', count: games.filter(g => g.category === 'adventure').length },
-          { id: 'memory', label: 'Memory', count: games.filter(g => g.category === 'memory').length }
-        ] as { id: GameFilter; label: string; count: number }[]).map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveFilter(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${focusRingClasses} ${
-              activeFilter === tab.id
-                ? `bg-gradient-to-r ${getAccessibleGradient('from-green-500 to-emerald-600')} text-white`
-                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-gray-700'
-            }`}
-          >
-            <span>{tab.label}</span>
-            <span className={`px-2 py-1 rounded-full text-xs ${
-              activeFilter === tab.id 
-                ? 'bg-white/20' 
-                : 'bg-gray-200 dark:bg-gray-700'
-            }`}>
-              {tab.count}
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Gaming Progress Overview */}
-      <div className={`bg-gradient-to-r ${getAccessibleGradient('from-green-500 to-emerald-600')} rounded-2xl p-6 mb-8 text-white`}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-2xl font-bold mb-2">Your Gaming Progress</h3>
-            <p className="text-green-100">
-              {filteredGames.filter(g => g.status === 'completed').length} games completed • 
-              {filteredGames.filter(g => g.status === 'playing').length} in progress
-            </p>
-          </div>
-          <div className="flex items-center gap-6 text-right">
-            <div>
-              <p className="text-3xl font-bold">
-                {filteredGames.filter(g => g.status === 'completed').reduce((total, game) => total + game.points, 0)}
-              </p>
-              <p className="text-green-100 text-sm">Points Earned</p>
-            </div>
-            <div className="w-px h-12 bg-green-400/50"></div>
-            <div>
-              <p className="text-3xl font-bold">
-                {Math.max(...filteredGames.map(g => g.highScore || 0))}
-              </p>
-              <p className="text-green-100 text-sm">Best Score</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Games Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredGames.map((game) => {
-          const headerGradient = getAccessibleGradient(game.color);
-          const actionGradient =
-            game.status === 'completed'
-              ? getAccessibleGradient('from-blue-600 to-indigo-600')
-              : game.status === 'locked'
-                ? undefined
-                : game.status === 'playing'
-                  ? getAccessibleGradient('from-orange-500 to-red-500')
-                  : getAccessibleGradient('from-green-600 to-emerald-600');
-
-          return (
-            <div 
-              key={game.id} 
-              className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col h-full ${
-                game.status === 'locked' ? 'opacity-60' : ''
-              }`}
-            >
-              {/* Game Header */}
-              <div className={`bg-gradient-to-r ${headerGradient} p-6 text-white`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-4xl">{game.icon}</div>
-                  <div className="flex gap-2">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize bg-white/20`}>
-                      {game.category}
-                    </span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium capitalize bg-white/20`}>
-                      {game.difficulty}
-                    </span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-2">{game.title}</h3>
-                <p className="text-white/90 text-sm">{game.description}</p>
+    <div className="min-h-screen bg-emerald-50 text-slate-800">
+      <div className="mx-auto flex max-w-4xl flex-col gap-10 px-4 py-10">
+        <section className="space-y-6">
+          <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-xl">
+            <div className="mb-6 flex flex-col gap-3 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.35em] text-emerald-500">Eco Game Spotlight</p>
+                <h2 className="text-3xl font-bold text-emerald-700">Take Care of Resources</h2>
+                <p className="mt-1 text-sm text-emerald-600">
+                  Patrol the EcoKids home, shut down wasteful appliances, and earn your Eco Impact score.
+                </p>
               </div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-600">
+                <span className="material-symbols-outlined text-base text-emerald-500">bolt</span>
+                Best for Ages 7–12
+              </span>
+            </div>
 
-              {/* Game Content */}
-              <div className="p-6 flex flex-col flex-1">
-                {/* Game Details */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-sm">schedule</span>
-                      {game.duration}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-sm">
-                        {game.players === 'single' ? 'person' : 'group'}
-                      </span>
-                      {game.players}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-lg text-green-600">+{game.points}</p>
-                    <p className="text-xs text-gray-500">points</p>
+            <div className="grid gap-5 md:grid-cols-[1.6fr_1fr]">
+              <div className="flex h-full flex-col justify-between rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 shadow-inner">
+                <div className="flex items-center gap-4">
+                  <img
+                    src="https://ecokids.net/wp-content/uploads/2023/08/cuidado-recursos-3.jpg"
+                    alt="Take Care of Resources preview"
+                    className="h-24 w-28 flex-shrink-0 rounded-2xl border border-emerald-100 object-cover shadow-sm"
+                  />
+                  <div className="space-y-2 text-sm text-emerald-600">
+                    <p className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-base text-emerald-500">check_circle</span>
+                      Turn off dripping taps, unused lights, and idle appliances.
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-base text-emerald-500">check_circle</span>
+                      Earn Eco Impact points for every smart choice you make.
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-base text-emerald-500">check_circle</span>
+                      Learn how everyday actions keep the planet healthy.
+                    </p>
                   </div>
                 </div>
 
-                {/* Progress Bar */}
-                {game.progress !== undefined && game.progress > 0 && (
-                  <div className="mb-4">
-                    <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      <span>Progress</span>
-                      <span>{game.progress}%</span>
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-center">
+                      <p className="text-[0.7rem] uppercase tracking-widest text-emerald-500">Duration</p>
+                      <p className="text-base font-semibold text-emerald-700">10–15 mins</p>
                     </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${game.progress}%` }}
-                      ></div>
+                    <div className="rounded-xl border border-emerald-200 bg-white px-3 py-2 text-center">
+                      <p className="text-[0.7rem] uppercase tracking-widest text-emerald-500">Mode</p>
+                      <p className="text-base font-semibold text-emerald-700">Single Player</p>
                     </div>
                   </div>
-                )}
 
-                {/* High Score */}
-                {game.highScore && game.highScore > 0 && (
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">High Score:</span>
-                    <span className="font-bold text-yellow-600">{game.highScore.toLocaleString()}</span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={handleStartGame}
+                      className={`flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-emerald-400/40 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 ${
+                        isPlaying
+                          ? 'bg-emerald-400 cursor-not-allowed'
+                          : 'bg-gradient-to-r from-emerald-500 to-green-500 hover:brightness-110'
+                      }`}
+                      disabled={isPlaying}
+                    >
+                      <span className="material-symbols-outlined text-base">play_arrow</span>
+                      {isPlaying ? 'Game Running' : 'Play Game'}
+                    </button>
+                    {isPlaying && (
+                      <button
+                        onClick={handleStopGame}
+                        className="flex items-center gap-2 rounded-full border border-emerald-400 px-4 py-2 text-sm font-semibold text-emerald-600 transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200"
+                      >
+                        <span className="material-symbols-outlined text-base">stop_circle</span>
+                        Stop
+                      </button>
+                    )}
                   </div>
-                )}
-
-                {/* Spacer to push status and button to bottom */}
-                <div className="flex-1"></div>
-
-                {/* Status Badge */}
-                <div className="flex items-center justify-between mb-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(game.status)}`}>
-                    {game.status === 'available' ? 'Ready to Play' : 
-                     game.status === 'playing' ? 'In Progress' : 
-                     game.status === 'completed' ? 'Completed' : 'Locked'}
-                  </span>
                 </div>
+              </div>
 
-                {/* Action Button */}
-                <button 
-                  className={`w-full py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg ${
-                    game.status === 'locked'
-                      ? `bg-gray-300 dark:bg-gray-600 text-gray-500 cursor-not-allowed ${focusRingClasses}`
-                      : `bg-gradient-to-r ${actionGradient} text-white hover:brightness-110 ${focusRingClasses}`
-                  }`}
-                  disabled={game.status === 'locked'}
-                  tabIndex={game.status === 'locked' ? -1 : 0}
-                >
-                  {game.status === 'completed' 
-                    ? '🎮 Play Again' 
-                    : game.status === 'locked'
-                    ? '🔒 Unlock Required'
-                    : game.status === 'playing'
-                    ? '▶️ Continue Game'
-                    : '🎮 Start Game'
-                  }
-                </button>
+              <div className="flex h-full flex-col justify-between gap-3 rounded-2xl border border-emerald-100 bg-white p-5 text-sm text-emerald-600 shadow-sm">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.25em] text-emerald-500">Game Goals</p>
+                  <p className="mt-2 leading-relaxed text-slate-600">
+                    Help children understand why saving water and electricity matters, starting with everyday choices at home.
+                    Encourage mindful habits that keep our planet thriving.
+                  </p>
+                </div>
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4">
+                  <p className="text-xs uppercase tracking-widest text-emerald-500">Best Tip</p>
+                  <p className="mt-1 text-sm text-emerald-600">
+                    {isPlaying
+                      ? 'Switch to full screen for the best experience and make sure your sound is on.'
+                      : 'Click “Play Game” to explore the EcoKids home and spot hidden resource leaks.'}
+                  </p>
+                </div>
               </div>
             </div>
-          );
-        })}
-      </div>
 
-      {/* Empty State */}
-      {filteredGames.length === 0 && (
-        <div className="text-center py-12">
-          <div className="material-symbols-outlined text-6xl text-gray-400 mb-4">sports_esports</div>
-          <h3 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">No games found</h3>
-          <p className="text-gray-600 dark:text-gray-400">Try selecting a different game category.</p>
-        </div>
-      )}
+            {isPlaying && (
+              <div className="mt-6 overflow-hidden rounded-3xl border border-emerald-100 shadow-inner">
+                <iframe
+                  title="Take Care of Resources Game"
+                  src="https://ecokids.net/juegos/cuida-los-recursos/index.html"
+                  className="h-[480px] w-full border-0"
+                  allowFullScreen
+                />
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 };
